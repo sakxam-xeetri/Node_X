@@ -11,6 +11,7 @@
 #include <WiFiUdp.h>
 #include <vector>
 #include <freertos/semphr.h>
+#include "nodex_defaults.h"
 
 class CaptivePortal {
 public:
@@ -29,8 +30,11 @@ public:
     // Blocking loop — run from a dedicated FreeRTOS task
     void dnsLoop();
 
+    void setSessionTimeoutMs(unsigned long ms);
+
 private:
     IPAddress _apIP;
+    unsigned long _sessionTimeoutMs = SESSION_TIMEOUT_MS;
     IPAddress _upstreamDNS;
     WiFiUDP   _dns;
     volatile bool _running = false;
