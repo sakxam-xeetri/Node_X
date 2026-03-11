@@ -50,3 +50,4 @@
 #define ADMIN_SESSION_TIMEOUT_MS  1800000UL    // 30 minutes
 #define DNS_FORWARD_TIMEOUT_MS    3000         // 3 seconds
 #define MAX_SAVED_NETWORKS        5            // extra Wi-Fi credentials stored in NVS
+#define DEFAULT_SESSION_TIMEOUT_MIN  60         // client session timeout in minutes
