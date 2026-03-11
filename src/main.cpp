@@ -128,14 +128,32 @@ void taskHealth(void* param) {
     for (;;) {
         TickType_t now = xTaskGetTickCount();
 
-        // Detect new client or STA connections and blink LED
+        // Track client count and STA state
         uint8_t clientCount = WifiMgr.getAPClientCount();
         bool staState = WifiMgr.isSTAConnected();
+
         if (clientCount > lastClientCount || (staState && !lastSTAState)) {
-            Led.notify();
             Serial.printf("[Health] Connection event (clients: %d, STA: %s)\n",
                           clientCount, staState ? "UP" : "DOWN");
         }
+
+        // LED: continuously blink while any client is connected; otherwise
+        // breathe (STA up) or fast-blink (STA down / error).
+        // Don't override BLINK_NOTIFY mid-sequence or BLINK_SLOW mid-reconnect.
+        {
+            StatusLED::Pattern cur = Led.getPattern();
+            if (clientCount > 0) {
+                if (cur != StatusLED::BLINK_SLOW && cur != StatusLED::BLINK_NOTIFY) {
+                    Led.setPattern(StatusLED::BLINK_SLOW);
+                }
+            } else {
+                if (cur == StatusLED::BLINK_SLOW) {
+                    // No clients — restore based on STA state
+                    Led.setPattern(staState ? StatusLED::BREATHE : StatusLED::BLINK_FAST);
+                }
+            }
+        }
+
         lastClientCount = clientCount;
         lastSTAState = staState;
 
@@ -150,14 +168,14 @@ void taskHealth(void* param) {
                 (now - lastReconnect) >= pdMS_TO_TICKS(STA_RECONNECT_INTERVAL_MS)) {
                 lastReconnect = now;
                 Serial.println("[Health] STA disconnected — attempting reconnect...");
-                Led.setPattern(StatusLED::BLINK_SLOW);
+                if (clientCount == 0) Led.setPattern(StatusLED::BLINK_SLOW);
 
                 if (WifiMgr.connectSTA()) {
                     WifiMgr.enableNAT();
-                    Led.setPattern(StatusLED::BREATHE);
+                    if (clientCount == 0) Led.setPattern(StatusLED::BREATHE);
                     Serial.println("[Health] Reconnected successfully");
                 } else {
-                    Led.setPattern(StatusLED::BLINK_FAST);
+                    if (clientCount == 0) Led.setPattern(StatusLED::BLINK_FAST);
                     Serial.println("[Health] Reconnect failed — will retry");
                 }
             }
