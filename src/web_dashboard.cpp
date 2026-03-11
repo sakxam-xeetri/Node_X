@@ -375,6 +375,7 @@ void WebDashboard::_handleConfig(AsyncWebServerRequest* req) {
     doc["apHidden"]     = cfg.apHidden;
     doc["apPass"]       = cfg.apPass;
     doc["adminCode"]    = cfg.adminCode;
+    doc["sessionTimeout"] = cfg.sessionTimeoutMin;
     Config.unlock();
     // STA/web/OTA passwords deliberately omitted
 
@@ -461,6 +462,13 @@ void WebDashboard::_handleSaveConfig(AsyncWebServerRequest* req,
     if (setWebUser)                       cfg.webUser      = newWebUser;
     if (setWebPass)                       cfg.webPass      = newWebPass;
     if (doc["otaPass"].is<String>())      cfg.otaPass      = doc["otaPass"].as<String>();
+    if (doc["sessionTimeout"].is<int>()) {
+        uint16_t st = doc["sessionTimeout"].as<uint16_t>();
+        if (st >= 1 && st <= 1440) {
+            cfg.sessionTimeoutMin = st;
+            Portal.setSessionTimeoutMs((unsigned long)st * 60000UL);
+        }
+    }
     Config.save();   // internally takes recursive mutex — safe while we hold it
     Config.unlock();
 
