@@ -537,66 +537,70 @@ const char WEB_CONNECTED_HTML[] PROGMEM = R"rawliteral(
 <title>Connected — NodeX</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#080808}
+::-webkit-scrollbar-thumb{background:#222}
 body{background:#080808;color:#e8e8e8;font-family:'Fira Code','Cascadia Code','Consolas',monospace;
-line-height:1.65;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
-.status-strip{width:100%;max-width:560px;margin-bottom:32px}
-.line{margin-bottom:5px;font-size:.88rem}
-.prompt{color:#4ec843;font-weight:600}
-.ok{color:#4ec843;font-weight:700}
-.dim{color:#666}.white{color:#e0e0e0}
-.card{width:100%;max-width:560px;border:1px solid #1e1e1e;background:#0d0d0d;
-padding:40px 36px;display:flex;flex-direction:column;align-items:center;text-align:center}
-.badge{display:inline-flex;align-items:center;gap:8px;background:#0a1f0a;border:1px solid #2a4a2a;
-border-radius:2px;padding:6px 18px;margin-bottom:28px}
-.badge-dot{width:8px;height:8px;background:#4ec843;border-radius:50%;
-animation:pulse 1.8s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
-.badge-txt{color:#4ec843;font-size:.82rem;font-weight:700;letter-spacing:.5px}
-.heading{color:#e8e8e8;font-size:1.45rem;font-weight:700;margin-bottom:6px;letter-spacing:1px}
-.subheading{color:#555;font-size:.8rem;margin-bottom:36px}
-.divider{width:100%;height:1px;background:linear-gradient(to right,transparent,#2a2a2a 30%,#2a2a2a 70%,transparent);margin-bottom:36px}
-.follow-label{color:#b48ead;font-size:.72rem;font-weight:700;letter-spacing:3px;
-text-transform:uppercase;margin-bottom:20px}
-.qr-frame{background:#fff;padding:14px;border-radius:4px;display:inline-block;
-box-shadow:0 0 0 1px #1e1e1e,0 0 40px rgba(180,142,173,.12);margin-bottom:24px}
-.qr-frame img{display:block;width:220px;height:220px;image-rendering:pixelated}
-.insta-btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;
-border:1px solid #b48ead;padding:10px 28px;color:#b48ead;font-size:.95rem;
-font-weight:700;letter-spacing:.5px;transition:.2s;border-radius:2px}
-.insta-btn:hover{background:#b48ead;color:#080808}
-.insta-icon{font-size:1.1rem}
-.footer-note{margin-top:28px;color:#333;font-size:.72rem}
-@media(max-width:500px){.card{padding:28px 18px}.qr-frame img{width:180px;height:180px}
-.heading{font-size:1.15rem}.insta-btn{font-size:.82rem;padding:9px 20px}}
+min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 20px}
+/* top bar */
+.top-bar{width:100%;max-width:580px;background:#111;border:1px solid #1a1a1a;
+padding:5px 18px;margin-bottom:0;font-size:.76rem;display:flex;align-items:center;gap:12px}
+.tb-tab{color:#4ec843;font-weight:700}.tb-path{color:#444}
+/* terminal card */
+.term{width:100%;max-width:580px;border:1px solid #1a1a1a;border-top:none;background:#0c0c0c;padding:22px 24px 28px}
+/* lines */
+.ln{margin-bottom:4px;font-size:.85rem;line-height:1.6}
+.p{color:#4ec843;font-weight:700}    /* prompt green */
+.w{color:#e8e8e8}                    /* white */
+.r{color:#e06060;font-weight:700}    /* red */
+.y{color:#f0c040;font-weight:700}    /* yellow */
+.d{color:#444}                       /* dim */
+.sep{display:block;border:none;border-top:1px dashed #1e1e1e;margin:16px 0}
+/* QR block */
+.qr-section{display:flex;flex-direction:column;align-items:center;margin-top:4px}
+.qr-label{font-size:.7rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;
+color:#f0c040;margin-bottom:14px}
+.qr-label::before{content:'## ';color:#444}
+.qr-wrap{background:#fff;padding:12px;display:inline-block;margin-bottom:18px}
+.qr-wrap img{display:block;width:210px;height:210px;image-rendering:pixelated}
+.insta-link{color:#e06060;text-decoration:none;font-size:1rem;font-weight:700;
+border:1px dashed #e06060;padding:8px 24px;display:inline-block;letter-spacing:.5px;transition:.2s}
+.insta-link:hover{background:#e06060;color:#080808;border-style:solid}
+.hint{font-size:.7rem;color:#333;margin-top:14px}
+.cursor{display:inline-block;width:8px;height:15px;background:#4ec843;
+animation:blink 1s step-end infinite;vertical-align:text-bottom;margin-left:3px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@media(max-width:480px){.qr-wrap img{width:170px;height:170px}.insta-link{font-size:.85rem}}
 </style>
 </head>
 <body>
-<div class="status-strip">
-  <div class="line"><span class="prompt">sakshyam@arch:~$</span> <span class="white">network-auth --grant</span></div>
-  <div class="line"><span class="ok">[&#10003;] Network access granted</span></div>
-  <div class="line"><span class="ok">[&#10003;] DNS forwarding active</span></div>
-  <div class="line"><span class="ok">[&#10003;] Internet access enabled</span></div>
+<div class="top-bar">
+  <span class="tb-tab">sakshyam@arch:~/nodex</span>
+  <span class="tb-path">connected &mdash; 80&times;24</span>
 </div>
-
-<div class="card">
-  <div class="badge">
-    <span class="badge-dot"></span>
-    <span class="badge-txt">CONNECTED TO NODEX</span>
+<div class="term">
+  <div class="ln"><span class="p">sakshyam@arch:~$</span> <span class="w">network-auth --grant</span></div>
+  <div class="ln"><span class="r">[&#10003;]</span> <span class="w">Network access granted</span></div>
+  <div class="ln"><span class="r">[&#10003;]</span> <span class="w">DNS forwarding active</span></div>
+  <div class="ln"><span class="r">[&#10003;]</span> <span class="w">Internet access enabled</span></div>
+  <hr class="sep">
+  <div class="ln"><span class="p">sakshyam@arch:~$</span> <span class="w">cat ./social.txt</span></div>
+  <div class="ln d">&nbsp;</div>
+  <div class="ln"><span class="y">  instagram  :</span> <span class="w">@sakxam_console.log</span></div>
+  <div class="ln"><span class="y">  status     :</span> <span class="r">follow requested</span></div>
+  <div class="ln d">&nbsp;</div>
+  <hr class="sep">
+  <div class="qr-section">
+    <div class="qr-label">Scan to follow</div>
+    <div class="qr-wrap">
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=440x440&data=https://www.instagram.com/sakxam_console.log/"
+           alt="Instagram QR Code">
+    </div>
+    <a class="insta-link" href="https://www.instagram.com/sakxam_console.log/"
+       target="_blank" rel="noopener noreferrer">@sakxam_console.log</a>
+    <div class="hint d">-- scan the QR or tap the link above --</div>
   </div>
-  <div class="heading">You&rsquo;re Online &#10003;</div>
-  <div class="subheading">Browsing is now active &mdash; you can close this page</div>
-  <div class="divider"></div>
-  <div class="follow-label">Follow the Dev</div>
-  <div class="qr-frame">
-    <img src="https://api.qrserver.com/v1/create-qr-code/?size=440x440&data=https://www.instagram.com/sakxam_console.log/"
-         alt="Scan to follow on Instagram">
-  </div>
-  <a class="insta-btn" href="https://www.instagram.com/sakxam_console.log/"
-     target="_blank" rel="noopener noreferrer">
-    <span class="insta-icon">&#128247;</span>
-    @sakxam_console.log
-  </a>
-  <div class="footer-note dim">Scan the QR code or tap the link above</div>
+  <hr class="sep">
+  <div class="ln"><span class="p">sakshyam@arch:~$</span> <span class="cursor"></span></div>
 </div>
 </body>
 </html>
