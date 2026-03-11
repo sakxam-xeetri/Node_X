@@ -78,6 +78,7 @@ void setup() {
 
     // 5. Captive portal DNS (must start after AP is up)
     Portal.begin(WiFi.softAPIP(), IPAddress(8, 8, 8, 8));
+    Portal.setSessionTimeoutMs((unsigned long)Config.get().sessionTimeoutMin * 60000UL);
 
     // 6. Connect to upstream Wi-Fi
     if (WifiMgr.connectSTA()) {
@@ -121,9 +122,23 @@ void taskHealth(void* param) {
     TickType_t lastCheck = 0;
     // Start lastReconnect at "now" — setup() already tried once, apply full cooldown
     TickType_t lastReconnect = xTaskGetTickCount();
+    uint8_t lastClientCount = WifiMgr.getAPClientCount();
+    bool lastSTAState = WifiMgr.isSTAConnected();
 
     for (;;) {
         TickType_t now = xTaskGetTickCount();
+
+        // Detect new client or STA connections and blink LED
+        uint8_t clientCount = WifiMgr.getAPClientCount();
+        bool staState = WifiMgr.isSTAConnected();
+        if (clientCount > lastClientCount || (staState && !lastSTAState)) {
+            Led.notify();
+            Serial.printf("[Health] Connection event (clients: %d, STA: %s)\n",
+                          clientCount, staState ? "UP" : "DOWN");
+        }
+        lastClientCount = clientCount;
+        lastSTAState = staState;
+
         if ((now - lastCheck) >= pdMS_TO_TICKS(HEALTH_CHECK_INTERVAL_MS)) {
             lastCheck = now;
 
