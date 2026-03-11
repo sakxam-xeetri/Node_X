@@ -34,6 +34,7 @@ void ConfigManager::load() {
     _cfg.webUser      = _prefs.getString("webUser",   WEB_USERNAME);
     _cfg.webPass      = _prefs.getString("webPass",   WEB_PASSWORD);
     _cfg.otaPass      = _prefs.getString("otaPass",   OTA_PASSWORD);
+    _cfg.sessionTimeoutMin = _prefs.getUShort("sessTime", DEFAULT_SESSION_TIMEOUT_MIN);
     // Load saved networks (JSON array in NVS)
     {
         String sn = _prefs.getString("savedNets", "[]");
@@ -61,6 +62,7 @@ void ConfigManager::save() {
     _prefs.putString("webUser",   _cfg.webUser);
     _prefs.putString("webPass",   _cfg.webPass);
     _prefs.putString("otaPass",   _cfg.otaPass);
+    _prefs.putUShort("sessTime", _cfg.sessionTimeoutMin);
     // Save networks array
     {
         JsonDocument jdoc;
