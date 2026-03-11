@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>sakshyam@arch ~ portfolio</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600;700&display=swap');
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: #080808; }
+  ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 3px; }
+
+  html { font-size: 14.5px; scroll-behavior: smooth; }
+
+  body {
+    background: #080808;
+    color: #e8e8e8;
+    font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+    line-height: 1.65;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── TOP BAR: pure linux tab bar ── */
+  .top-bar {
+    position: sticky; top: 0; z-index: 20;
+    background: #111;
+    border-bottom: 1px solid #1e1e1e;
+    padding: 6px 32px;
+    display: flex; align-items: center; gap: 16px;
+    font-size: 0.78rem;
+  }
+  .top-bar-tab {
+    color: #4ec843;
+    background: #1a1a1a;
+    padding: 3px 14px;
+    border: 1px solid #2a2a2a;
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+  }
+  .top-bar-path { color: #555; }
+
+  /* ── TERMINAL BODY ── */
+  .terminal-body {
+    flex: 1;
+    padding: 24px 32px 32px;
+    width: 100%;
+  }
+
+  .block {
+    margin-bottom: 20px;
+    opacity: 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  .block.visible { opacity: 1; }
+
+  /* ── PROMPT ── */
+  .prompt { color: #4ec843; font-weight: 600; }
+  .prompt-user { color: #5b9bd5; }
+  .prompt-at { color: #888; }
+  .prompt-host { color: #b48ead; }
+  .prompt-path { color: #87ceeb; }
+  .prompt-dollar { color: #e06060; }
+
+  .cmd { color: #ffffff; font-weight: 400; }
+
+  /* ── ASCII ART ── */
+  .ascii-art {
+    color: #ffffff;
+    font-size: clamp(0.55rem, 1.32vw, 1.05rem);
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+    white-space: pre;
+    overflow-x: hidden;
+    display: block;
+    width: 100%;
+  }
+
+  /* ── TAGLINE ── */
+  .tagline { color: #e8e8e8; font-weight: 700; letter-spacing: 4px; font-size: clamp(0.75rem, 1.1vw, 1rem); }
+  .tagline-dot { color: #e06060; }
+
+  /* ── ABOUT ROLES: each a different color ── */
+  .role-ai    { color: #e06060; font-weight: 700; }
+  .role-robot { color: #87ceeb; font-weight: 700; }
+  .role-embed { color: #b48ead; font-weight: 700; }
+
+  .white { color: #e0e0e0; }
+  .dim   { color: #777; }
+
+  /* ── SECTION TITLES ── */
+  .section-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding-bottom: 6px;
+    margin-bottom: 10px;
+    display: block;
+    border-bottom: 1px solid #1a1a1a;
+  }
+  .section-title.sky    { color: #87ceeb; }
+  .section-title.navy   { color: #5b9bd5; }
+  .section-title.purple { color: #b48ead; }
+  .section-title.yellow { color: #f0c040; }
+  .section-title.red    { color: #e06060; }
+
+  /* ── KEYWORD HIGHLIGHTS in desc text ── */
+  .kw-red { color: #e06060; }
+
+  /* ── SKILL GRID: fills width ── */
+  .skill-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 2px 32px;
+    width: 100%;
+  }
+  .skill-item { display: flex; align-items: baseline; gap: 6px; }
+  /* ── BULLETS: red ── */
+  .bullet  { color: #e06060; flex-shrink: 0; }
+  .skill-tag { color: #e0e0e0; }
+
+  /* ── DESCRIPTION PARAGRAPHS ── */
+  .desc-block {
+    text-align: justify;
+    max-width: 100%;
+    color: #e0e0e0;
+    line-height: 1.8;
+  }
+
+  /* ── LINKS: red at the bottom ── */
+  .link { color: #e06060; text-decoration: none; }
+  .link:hover { text-decoration: underline; color: #ff8888; }
+
+  /* ── CONTACT LABEL ── */
+  .contact-label { color: #b48ead; }
+
+  /* ── SEPARATOR spans full width ── */
+  .sep {
+    display: block;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(to right, #1a1a1a, #e06060 40%, #e06060 60%, #1a1a1a);
+    opacity: 0.18;
+    margin: 8px 0;
+  }
+
+  /* ── CURSOR ── */
+  .cursor-blink {
+    display: inline-block;
+    width: 9px; height: 17px;
+    background: #4ec843;
+    animation: blink 1s step-end infinite;
+    vertical-align: text-bottom;
+    margin-left: 2px;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  /* ── BOTTOM STATUS BAR: subtle, multi-color ── */
+  .status-bar {
+    position: sticky; bottom: 0; z-index: 20;
+    background: #111;
+    border-top: 1px solid #1e1e1e;
+    padding: 4px 32px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+  .sb-mode { color: #4ec843; }
+  .sb-file { color: #888; }
+  .sb-info { color: #5b9bd5; }
+  .sb-enc  { color: #777; }
+  .sb-red  { color: #e06060; }
+
+  /* ── HACKER POPUP ── */
+  #hack-popup {
+    display: none;
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(0,0,0,0.72);
+    align-items: center; justify-content: center;
+  }
+  #hack-popup.show { display: flex; }
+  .hack-box {
+    background: #0d0d0d;
+    border: 1px solid #f0c040;
+    border-left: 3px solid #f0c040;
+    padding: 20px 28px 22px;
+    width: 360px;
+    max-width: 90vw;
+    font-size: 0.8rem;
+    line-height: 1.9;
+    position: relative;
+    box-shadow: 0 0 18px rgba(240,192,64,0.18);
+  }
+  .hack-close-btn {
+    position: absolute; top: 8px; right: 12px;
+    background: none; border: none; color: #f0c040;
+    font-family: inherit; font-size: 0.9rem;
+    cursor: pointer; display: none;
+  }
+  .hack-close-btn:hover { color: #ffe080; }
+  .hack-close-btn.visible { display: block; }
+  .hack-line { color: #f0c040; }
+  .hack-line .hl-key { color: #c8a030; }
+  .hack-line .hl-ip  { color: #ffe080; font-weight: 700; }
+  .hack-line .hl-ok  { color: #f0c040; font-weight: 700; }
+  .hack-line .hl-red { color: #f0c040; }
+
+  /* ── RESPONSIVE ── */
+  @media (min-width: 1600px) {
+    .terminal-body { padding: 28px 64px 40px; }
+  }
+  @media (max-width: 900px) {
+    .terminal-body { padding: 18px 20px 28px; }
+    .skill-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+  }
+  @media (max-width: 600px) {
+    html { font-size: 12px; }
+    .terminal-body { padding: 12px 12px 20px; }
+    .top-bar, .status-bar { padding: 4px 12px; }
+    .skill-grid { grid-template-columns: 1fr; }
+    .tagline { letter-spacing: 1px; }
+  }
+
+  /* ── BOOT SCREEN ── */
+  #boot-screen {
+    position: fixed; inset: 0; z-index: 999;
+    background: #080808;
+    display: flex; flex-direction: column;
+    padding: 32px;
+    overflow: hidden;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: #ccc;
+    transition: opacity 0.4s;
+  }
+  #boot-screen.fade-out { opacity: 0; }
+  #boot-screen .boot-line { white-space: pre; }
+  .boot-ok { color: #4ec843; font-weight: 700; }
+  .boot-warn { color: #f0c040; }
+  .boot-fail { color: #e06060; }
+  .boot-info { color: #5b9bd5; }
+  .boot-dim { color: #555; }
+  .boot-purple { color: #b48ead; }
+  .boot-white { color: #e8e8e8; font-weight: 700; }
+  .boot-progress {
+    display: inline-block;
+    width: 200px;
+    height: 10px;
+    border: 1px solid #333;
+    margin-top: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+  .boot-progress-fill {
+    height: 100%;
+    background: #4ec843;
+    width: 0%;
+    transition: width 0.15s linear;
+  }
+</style>
+</head>
+<body>
+
+<!-- HACKER POPUP -->
+<div id="hack-popup">
+  <div class="hack-box">
+    <button class="hack-close-btn" id="hack-close-btn" onclick="closeHackPopup()">✕</button>
+    <div id="hack-box-inner"></div>
+  </div>
+</div>
+
+<!-- BOOT SCREEN -->
+<div id="boot-screen"></div>
+
+<!-- TOP BAR -->
+<div class="top-bar" style="display:none" id="top-bar">
+  <span class="top-bar-tab">sakshyam@arch:~/portfolio</span>
+  <span class="top-bar-path">bash — 80×24</span>
+</div>
+
+<!-- TERMINAL -->
+<div class="terminal-body" id="terminal" style="display:none"></div>
+
+<!-- BOTTOM STATUS BAR -->
+<div class="status-bar" style="display:none" id="status-bar">
+  <span><span class="sb-mode">NORMAL</span></span>
+  <span class="sb-file">~/portfolio/README.md</span>
+  <span><span class="sb-info">ln 1</span> <span class="sb-enc">utf-8</span> <span class="sb-red">linux</span></span>
+</div>
+
+<script>
+const bootScreen = document.getElementById('boot-screen');
+const topBar = document.getElementById('top-bar');
+const statusBar = document.getElementById('status-bar');
+const terminal = document.getElementById('terminal');
+
+function buildPrompt() {
+  return '<span class="prompt"><span class="prompt-user">sakshyam</span>' +
+    '<span class="prompt-at">@</span>' +
+    '<span class="prompt-host">arch</span>' +
+    ':<span class="prompt-path">~</span>' +
+    '<span class="prompt-dollar">$</span></span> ';
+}
+
+const sections = [
+  { type: 'command', cmd: 'neofetch --ascii', delay: 25 },
+  {
+    type: 'ascii',
+    content:
+`███████╗ █████╗ ██╗  ██╗███████╗██╗  ██╗██╗   ██╗ █████╗ ███╗   ███╗
+██╔════╝██╔══██╗██║ ██╔╝██╔════╝██║ ██╔╝╚██╗ ██╔╝██╔══██╗████╗ ████║
+███████╗███████║█████╔╝ ███████╗█████╔╝  ╚████╔╝ ███████║██╔████╔██║
+╚════██║██╔══██║██╔═██╗ ╚════██║██╔═██╗   ╚██╔╝  ██╔══██║██║╚██╔╝██║
+███████║██║  ██║██║  ██╗███████║██║  ██╗   ██║   ██║  ██║██║ ╚═╝ ██║
+╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚═╝     ╚═╝
+██████╗  █████╗ ███████╗████████╗ █████╗ ██╗  ██╗ ██████╗ ████████╗██╗
+██╔══██╗██╔══██╗██╔════╝╚══██╔══╝██╔══██╗██║ ██╔╝██╔═══██╗╚══██╔══╝██║
+██████╔╝███████║███████╗   ██║   ███████║█████╔╝ ██║   ██║   ██║   ██║
+██╔══██╗██╔══██║╚════██║   ██║   ██╔══██║██╔═██╗ ██║   ██║   ██║   ██║
+██████╔╝██║  ██║███████║   ██║   ██║  ██║██║  ██╗╚██████╔╝   ██║   ██║
+╚═════╝ ╚═╝  ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝`
+  },
+  {
+    type: 'raw',
+    html: '<span class="tagline">EMBEDDED <span class="tagline-dot">•</span> AI <span class="tagline-dot">•</span> ROBOTICS <span class="tagline-dot">•</span> IOT</span>'
+  },
+  { type: 'sep' },
+
+  { type: 'command', cmd: 'cat ./about.md', delay: 25 },
+  {
+    type: 'about',
+    roles: [
+      { text: 'AI & Machine Learning Enthusiast', cls: 'role-ai' },
+      { text: 'Robotics & IoT Developer', cls: 'role-robot' },
+      { text: 'Embedded Systems Engineer', cls: 'role-embed' },
+    ],
+    paragraphs: [
+      'I am an AI and Machine Learning enthusiast with a strong passion for robotics, IoT, and embedded systems. My work centers on developing intelligent, real-world solutions through seamless integration of hardware and software.',
+      'With hands-on experience across microcontrollers and computing platforms — including ESP32, ESP8266, Arduino, and Raspberry Pi — I design and build systems that integrate AI, computer vision, sensor networks, and automation technologies.',
+    ],
+    charDelay: 5
+  },
+  { type: 'sep' },
+
+  { type: 'command', cmd: 'ls -la ./skills/', delay: 25 },
+  {
+    type: 'skillblock',
+    title: '[ Programming & Software Development ]',
+    titleColor: 'sky',
+    items: ['Python','C / C++','JavaScript','HTML5 / CSS3','React','Tailwind CSS','REST APIs','Git & GitHub','Linux CLI','Arduino IDE','PlatformIO','VS Code'],
+    charDelay: 4
+  },
+  { type: 'sep' },
+
+  { type: 'command', cmd: 'cat ./skills/hardware.list', delay: 25 },
+  {
+    type: 'skillblock',
+    title: '[ Hardware & Embedded Systems ]',
+    titleColor: 'navy',
+    items: ['ESP32','ESP8266','Arduino (Uno/Nano/Mega)','Raspberry Pi','NodeMCU','IoT Sensor Integration','Motor Control Systems','L298N Motor Driver','Servo & Stepper Motors','UART / I2C / SPI','PCB Design & Prototyping','Edge Device Development','Embedded C Development'],
+    charDelay: 4
+  },
+  { type: 'sep' },
+
+  { type: 'command', cmd: 'cat ./skills/ai-ml.list', delay: 25 },
+  {
+    type: 'skillblock',
+    title: '[ Artificial Intelligence & Machine Learning ]',
+    titleColor: 'purple',
+    items: ['Google Gemini AI','DeepFace','TensorFlow','PyTorch','OpenCV','YOLOv8','Computer Vision Systems','Face Recognition','Emotion Detection','OCR','AI on Edge Devices','Intelligent Automation'],
+    charDelay: 4
+  },
+  { type: 'sep' },
+
+  { type: 'command', cmd: 'cat ./skills/security.list', delay: 25 },
+  {
+    type: 'skillblock',
+    title: '[ Cybersecurity & Security Tools ]',
+    titleColor: 'yellow',
+    items: ['Kali Linux','Wireshark','Metasploit Framework','Aircrack-ng','Burp Suite','Shodan','Network Analysis','Wireless Security Testing','Vulnerability Assessment','Penetration Testing','OSINT Techniques'],
+    charDelay: 4
+  },
+  { type: 'sep' },
+
+  { type: 'command', cmd: 'cat ./skills/exploring.list', delay: 25 },
+  {
+    type: 'skillblock',
+    title: '[ Currently Learning & Exploring ]',
+    titleColor: 'sky',
+    items: ['Advanced ML Systems','AI-Driven Robotics','Edge AI Deployment','Full-Stack IoT','Secure Embedded Systems','Ethical Hacking & Red Teaming','Cloud-Integrated IoT','DevOps for Intelligent Systems','Scalable System Design'],
+    charDelay: 4
+  },
+  { type: 'sep' },
+
+  { type: 'command', cmd: 'cat ./approach.md', delay: 25 },
+  {
+    type: 'textblock',
+    title: '[ Professional Approach ]',
+    titleColor: 'yellow',
+    text: 'Focus on designing scalable, production-oriented systems rather than limited prototypes. Actively exploring emerging technologies in AI-driven robotics, intelligent automation, and cybersecurity, with a strong commitment to continuous learning and open-source collaboration.',
+    charDelay: 5
+  },
+  { type: 'sep' },
+
+  { type: 'command', cmd: 'cat ./objective.md', delay: 25 },
+  {
+    type: 'textblock',
+    title: '[ Career Objective ]',
+    titleColor: 'navy',
+    text: 'To grow as a full-stack hardware–software developer and contribute to impactful innovations in artificial intelligence, robotics, and smart technologies that solve meaningful real-world problems.',
+    charDelay: 5
+  },
+  { type: 'sep' },
+
+  { type: 'command', cmd: 'cat ./contact.json', delay: 25 },
+  {
+    type: 'contact',
+    title: '[ Contact Information ]',
+    charDelay: 5
+  },
+  { type: 'sep' },
+
+  { type: 'command', cmd: 'cat ./socials.json', delay: 25 },
+  {
+    type: 'socials',
+    title: '[ Social & Professional Profiles ]',
+    charDelay: 5
+  },
+  { type: 'sep' },
+
+  { type: 'final' }
+];
+
+/* ── Helpers ── */
+function el(tag, cls) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  return e;
+}
+function createBlock() {
+  const d = el('div','block');
+  terminal.appendChild(d);
+  return d;
+}
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function scrollEnd() { window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); }
+
+async function typeInto(node, text, delay) {
+  for (let i = 0; i < text.length; i++) {
+    node.textContent += text[i];
+    if (i % 4 === 0) scrollEnd();
+    if (delay > 0) await sleep(delay);
+  }
+}
+
+/* ── Renderers ── */
+
+/* Only commands get typed char-by-char. All output appears instantly. */
+async function renderCommand(s) {
+  const b = createBlock(); b.classList.add('visible');
+  b.innerHTML = buildPrompt();
+  const c = el('span','cmd'); b.appendChild(c);
+  await typeInto(c, s.cmd, s.delay);
+  await sleep(120);
+}
+
+async function renderAscii(s) {
+  const b = createBlock(); b.classList.add('visible');
+  const pre = el('div','ascii-art'); pre.textContent = s.content;
+  b.appendChild(pre); scrollEnd(); await sleep(80);
+}
+
+async function renderRaw(s) {
+  const b = createBlock(); b.classList.add('visible');
+  b.innerHTML = s.html; scrollEnd(); await sleep(80);
+}
+
+async function renderSep() {
+  const b = createBlock(); b.classList.add('visible');
+  b.appendChild(el('div','sep')); scrollEnd(); await sleep(30);
+}
+
+async function renderAbout(s) {
+  const b = createBlock(); b.classList.add('visible');
+  for (const role of s.roles) {
+    const r = el('div', role.cls);
+    r.textContent = role.text;
+    b.appendChild(r);
+  }
+  b.appendChild(document.createElement('br'));
+  for (const p of s.paragraphs) {
+    const d = el('div','desc-block');
+    d.textContent = p;
+    b.appendChild(d);
+    b.appendChild(document.createElement('br'));
+  }
+  scrollEnd(); await sleep(80);
+}
+
+async function renderSkillBlock(s) {
+  const b = createBlock(); b.classList.add('visible');
+  const t = el('div','section-title ' + (s.titleColor || 'sky'));
+  t.textContent = s.title;
+  b.appendChild(t);
+
+  const grid = el('div','skill-grid'); b.appendChild(grid);
+  for (const item of s.items) {
+    const row = el('div','skill-item');
+    const bul = el('span','bullet'); bul.textContent = '▸';
+    const txt = el('span','skill-tag'); txt.textContent = item;
+    row.appendChild(bul); row.appendChild(txt); grid.appendChild(row);
+  }
+  scrollEnd(); await sleep(80);
+}
+
+async function renderTextBlock(s) {
+  const b = createBlock(); b.classList.add('visible');
+  const t = el('div','section-title ' + (s.titleColor || 'sky'));
+  t.textContent = s.title;
+  b.appendChild(t);
+  const d = el('div','desc-block');
+  d.textContent = s.text;
+  b.appendChild(d);
+  scrollEnd(); await sleep(80);
+}
+
+async function renderContact(s) {
+  const b = createBlock(); b.classList.add('visible');
+  const t = el('div','section-title red');
+  t.textContent = s.title;
+  b.appendChild(t);
+
+  const entries = [
+    { lbl: 'Location', val: 'Kathmandu, Nepal', link: null },
+    { lbl: 'Email   ', val: 'sakshyamxeetri@gmail.com', link: 'mailto:sakshyamxeetri@gmail.com' },
+    { lbl: 'Phone   ', val: '+977 97643 20750', link: 'tel:+9779764320750' },
+    { lbl: 'Website ', val: 'sakshyambastakoti.com.np', link: 'https://sakshyambastakoti.com.np' },
+  ];
+  for (const e of entries) {
+    const row = el('div','skill-item');
+    const bul = el('span','bullet'); bul.textContent = '▸';
+    const lbl = el('span','contact-label'); lbl.textContent = e.lbl + ' : ';
+    row.appendChild(bul); row.appendChild(lbl);
+    if (e.link) {
+      const a = document.createElement('a');
+      a.className = 'link'; a.href = e.link; a.target = '_blank'; a.rel = 'noopener noreferrer';
+      a.textContent = e.val; row.appendChild(a);
+    } else {
+      const v = el('span','white'); v.textContent = e.val; row.appendChild(v);
+    }
+    b.appendChild(row);
+  }
+  scrollEnd(); await sleep(80);
+}
+
+async function renderSocials(s) {
+  const b = createBlock(); b.classList.add('visible');
+  const t = el('div','section-title red');
+  t.textContent = s.title;
+  b.appendChild(t);
+
+  const socials = [
+    { lbl: 'LinkedIn ', url: 'https://www.linkedin.com/in/sakshyambastakoti/', txt: 'linkedin.com/in/sakshyambastakoti' },
+    { lbl: 'GitHub   ', url: 'https://github.com/sakxam-xeetri', txt: 'github.com/sakxam-xeetri' },
+    { lbl: 'Instagram', url: 'https://www.instagram.com/sakxam_console.log/', txt: 'instagram.com/sakxam_console.log' },
+  ];
+  for (const e of socials) {
+    const row = el('div','skill-item');
+    const bul = el('span','bullet'); bul.textContent = '▸';
+    const lbl = el('span','contact-label'); lbl.textContent = e.lbl + ' : ';
+    row.appendChild(bul); row.appendChild(lbl);
+    const a = document.createElement('a');
+    a.className = 'link'; a.href = e.url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+    a.textContent = e.txt; row.appendChild(a);
+    b.appendChild(row);
+  }
+  scrollEnd(); await sleep(80);
+}
+
+async function renderFinal() {
+  const b = createBlock(); b.classList.add('visible');
+  b.innerHTML = buildPrompt();
+  const c = el('span','cursor-blink'); c.innerHTML = '&nbsp;';
+  b.appendChild(c); scrollEnd();
+}
+
+async function run() {
+  for (const s of sections) {
+    switch(s.type) {
+      case 'command':    await renderCommand(s); break;
+      case 'ascii':      await renderAscii(s); break;
+      case 'raw':        await renderRaw(s); break;
+      case 'sep':        await renderSep(); break;
+      case 'about':      await renderAbout(s); break;
+      case 'skillblock': await renderSkillBlock(s); break;
+      case 'textblock':  await renderTextBlock(s); break;
+      case 'contact':    await renderContact(s); break;
+      case 'socials':    await renderSocials(s); break;
+      case 'final':      await renderFinal(); break;
+    }
+  }
+  setTimeout(showHackPopup, 3000);
+}
+
+/* ── HACKER POPUP ── */
+function closeHackPopup() {
+  document.getElementById('hack-popup').classList.remove('show');
+}
+
+async function showHackPopup() {
+  let ip = '...';
+  try {
+    const res = await fetch('https://api.ipify.org?format=json');
+    const data = await res.json();
+    ip = data.ip;
+  } catch(e) { ip = '127.0.0.1'; }
+
+  const box = document.getElementById('hack-box-inner');
+  box.innerHTML = '';
+  document.getElementById('hack-popup').classList.add('show');
+
+  const lines = [
+    '<span class="hl-red">[!] connection intercepted</span>',
+    '<span class="hl-key">ip address found  : </span><span class="hl-ip">' + ip + '</span>',
+    '<span class="hl-key">collecting info   : </span><span style="color:#f0c040">local fingerprint</span>',
+    '<span class="hl-key">sending data      : </span><span style="color:#f0c040">port 443 → ' + ip + '</span>',
+    '<span class="hl-key">status            : </span><span class="hl-ok">DATA SENT — OK</span>',
+  ];
+
+  for (const html of lines) {
+    const div = document.createElement('div');
+    div.className = 'hack-line';
+    div.innerHTML = html;
+    box.appendChild(div);
+  }
+
+  document.getElementById('hack-close-btn').classList.add('visible');
+  setTimeout(closeHackPopup, 2000);
+}
+
+/* ── BOOT SEQUENCE ── */
+
+const bootLines = [
+  { text: 'BIOS v3.14.1 — Sakshyam Systems Inc.', cls: 'boot-white', d: 80 },
+  { text: 'Copyright (C) 2024-2026. All rights reserved.', cls: 'boot-dim', d: 60 },
+  { text: '', d: 120 },
+  { text: 'CPU: Intel(R) Core(TM) i7-13700K @ 5.40GHz', cls: '', d: 40 },
+  { text: 'RAM: 32768 MB DDR5 — OK', cls: '', d: 40, tag: 'ok' },
+  { text: 'GPU: NVIDIA RTX 4070 Ti — Detected', cls: '', d: 40, tag: 'ok' },
+  { text: 'NVMe SSD: 1TB — /dev/nvme0n1', cls: '', d: 40 },
+  { text: '', d: 80 },
+  { text: 'Initializing kernel 6.8.2-arch1-1 ...', cls: 'boot-info', d: 100 },
+  { text: '[    0.000000] Linux version 6.8.2-arch1-1 (linux@archlinux)', cls: 'boot-dim', d: 30 },
+  { text: '[    0.004521] Command line: BOOT_IMAGE=/vmlinuz-linux', cls: 'boot-dim', d: 25 },
+  { text: '[    0.012744] x86/cpu: SGX disabled by BIOS', cls: 'boot-dim', d: 25 },
+  { text: '[    0.048103] ACPI: RSDP 0x00000000000F0490', cls: 'boot-dim', d: 20 },
+  { text: '[    0.091002] PCI: Using configuration type 1', cls: 'boot-dim', d: 20 },
+  { text: '', d: 60 },
+  { text: ':: running early hook [udev]', cls: '', d: 50 },
+  { text: 'Starting systemd-udevd... ', cls: '', d: 50, tag: 'ok' },
+  { text: ':: running hook [encrypt]', cls: '', d: 40 },
+  { text: ':: running hook [filesystems]', cls: '', d: 40 },
+  { text: 'Mounting /dev/nvme0n1p2 on / ...', cls: '', d: 60, tag: 'ok' },
+  { text: 'Mounting /dev/nvme0n1p1 on /boot ...', cls: '', d: 40, tag: 'ok' },
+  { text: '', d: 60 },
+  { text: 'systemd 255.4-2-arch started.', cls: 'boot-info', d: 60 },
+  { text: '[ OK ] Started Network Manager.', cls: '', d: 40, tag: 'ok' },
+  { text: '[ OK ] Reached target Network.', cls: '', d: 30, tag: 'ok' },
+  { text: '[ OK ] Started OpenSSH Daemon.', cls: '', d: 30, tag: 'ok' },
+  { text: '[ OK ] Started Firewall (nftables).', cls: '', d: 30, tag: 'ok' },
+  { text: '[ OK ] Reached target Multi-User System.', cls: '', d: 40, tag: 'ok' },
+  { text: '', d: 50 },
+  { text: 'Loading portfolio environment...', cls: 'boot-purple', d: 80 },
+  { text: '  > node_modules        ✓', cls: '', d: 35, tag: 'ok' },
+  { text: '  > skill_registry      ✓', cls: '', d: 35, tag: 'ok' },
+  { text: '  > ai_models           ✓', cls: '', d: 35, tag: 'ok' },
+  { text: '  > hardware_drivers    ✓', cls: '', d: 35, tag: 'ok' },
+  { text: '  > security_tools      ✓', cls: '', d: 35, tag: 'ok' },
+  { text: '', d: 40 },
+  { text: 'All systems operational.', cls: 'boot-white', d: 80 },
+  { text: '', d: 40 },
+  { text: 'arch login: sakshyam', cls: '', d: 100 },
+  { text: 'Password: ••••••••••••', cls: 'boot-dim', d: 120 },
+  { text: '', d: 60 },
+  { text: 'Welcome to Arch Linux — sakshyam@arch', cls: 'boot-info', d: 80 },
+  { text: '__LASTLOGIN__', cls: 'boot-dim', d: 60 },
+  { text: '', d: 80 },
+  { text: 'Launching terminal session...', cls: 'boot-purple', d: 200 },
+];
+
+// session log: read last visit, save current visit
+(function() {
+  const key = 'sb_last_login';
+  const prev = localStorage.getItem(key);
+  const now = new Date().toString().replace(/\s*\(.*\)$/, '');
+  const display = prev ? 'Last login: ' + prev : 'Last login: first session';
+  localStorage.setItem(key, now);
+  const idx = bootLines.findIndex(l => l.text === '__LASTLOGIN__');
+  if (idx !== -1) bootLines[idx].text = display;
+})();
+
+function bootLine(html) {
+  const d = document.createElement('div');
+  d.className = 'boot-line';
+  d.innerHTML = html;
+  bootScreen.appendChild(d);
+  bootScreen.scrollTop = bootScreen.scrollHeight;
+}
+
+async function runBoot() {
+  for (const l of bootLines) {
+    if (l.text === '') { bootLine('&nbsp;'); }
+    else if (l.tag === 'ok') {
+      const parts = l.text.split('✓');
+      if (parts.length === 2) {
+        bootLine(`<span class="${l.cls}">${parts[0]}</span><span class="boot-ok">✓</span>`);
+      } else if (l.text.startsWith('[ OK ]')) {
+        bootLine(`<span class="boot-ok">[ OK ]</span><span class="${l.cls || ''}">${l.text.slice(6)}</span>`);
+      } else {
+        const idx = l.text.lastIndexOf('—');
+        if (idx > -1) {
+          bootLine(`<span class="${l.cls}">${l.text.slice(0, idx + 1)}</span> <span class="boot-ok">${l.text.slice(idx + 2)}</span>`);
+        } else {
+          bootLine(`<span class="${l.cls}">${l.text}</span> <span class="boot-ok">OK</span>`);
+        }
+      }
+    } else {
+      bootLine(`<span class="${l.cls}">${l.text}</span>`);
+    }
+    await sleep(l.d);
+  }
+
+  await sleep(300);
+  bootScreen.classList.add('fade-out');
+  await sleep(400);
+  bootScreen.style.display = 'none';
+  topBar.style.display = '';
+  terminal.style.display = '';
+  statusBar.style.display = '';
+  run();
+}
+
+runBoot();
+</script>
+
+</body>
+</html>
