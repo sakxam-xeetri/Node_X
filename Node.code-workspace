@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "../Node"
+		},
+		{
+			"name": "ESP32-WiFi-Repeater",
+			"path": "../Node/ESP32-WiFi-Repeater"
+		}
+	],
+	"settings": {}
+}
