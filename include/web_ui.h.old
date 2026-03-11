@@ -1,0 +1,467 @@
+// ============================================================================
+// NodeX — Embedded Web UI (single-header, raw string literal)
+// ============================================================================
+#pragma once
+
+// ======================== CAPTIVE PORTAL LOGIN PAGE =========================
+const char WEB_PORTAL_HTML[] PROGMEM = R"rawliteral(
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NodeX — Wi-Fi Login</title>
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--accent:#3b82f6;--accent2:#22d3ee;--text:#e2e8f0;
+--text2:#94a3b8;--red:#ef4444;--green:#22c55e;--border:#334155;--radius:12px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);
+min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.wrap{max-width:400px;width:100%}
+.logo{text-align:center;margin-bottom:24px}
+.logo h1{font-size:2rem;font-weight:700;color:#fff;letter-spacing:-1px}
+.logo h1 span{color:var(--accent2)}
+.logo p{font-size:.85rem;color:var(--text2);margin-top:4px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:24px;margin-bottom:16px}
+.card h2{font-size:.85rem;text-transform:uppercase;letter-spacing:1px;color:var(--text2);
+margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.card h2::before{content:'';width:4px;height:16px;border-radius:2px}
+.card.connect h2::before{background:var(--green)}
+.card.admin h2::before{background:var(--accent)}
+.field{margin-bottom:12px}
+.field input{width:100%;padding:12px 14px;background:var(--bg);border:1px solid var(--border);
+border-radius:8px;color:var(--text);font-size:.9rem;outline:none;transition:.2s}
+.field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(59,130,246,.15)}
+.field input::placeholder{color:var(--text2)}
+.btn{width:100%;padding:12px;border:none;border-radius:8px;font-size:.9rem;font-weight:600;
+cursor:pointer;transition:.2s}
+.btn-green{background:var(--green);color:#000}.btn-green:hover{background:#16a34a}
+.btn-blue{background:var(--accent);color:#fff}.btn-blue:hover{background:#2563eb}
+.error{background:rgba(239,68,68,.15);border:1px solid var(--red);border-radius:8px;
+padding:10px 14px;color:var(--red);font-size:.85rem;margin-bottom:16px;display:none}
+.divider{text-align:center;color:var(--text2);font-size:.75rem;text-transform:uppercase;
+letter-spacing:1px;margin:8px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">
+    <h1>Node<span>X</span></h1>
+    <p>Wi-Fi Repeater &mdash; Enter password to connect</p>
+  </div>
+  <div class="error" id="error"></div>
+  <div class="card connect">
+    <h2>Connect to Internet</h2>
+    <form action="/portal/connect" method="POST">
+      <div class="field"><input type="password" name="password" placeholder="Wi-Fi password" required autocomplete="off"></div>
+      <button type="submit" class="btn btn-green">Connect</button>
+    </form>
+  </div>
+  <div class="divider">or</div>
+  <div class="card admin">
+    <h2>Admin Portal</h2>
+    <form action="/portal/admin" method="POST">
+      <div class="field"><input type="text" name="username" placeholder="Username" required autocomplete="off"></div>
+      <div class="field"><input type="password" name="password" placeholder="Password" required autocomplete="off"></div>
+      <button type="submit" class="btn btn-blue">Login</button>
+    </form>
+  </div>
+</div>
+<script>
+const p=new URLSearchParams(location.search);
+if(p.get('error')==='wrong_password'){
+  const e=document.getElementById('error');
+  e.textContent='Incorrect Wi-Fi password. Please try again.';
+  e.style.display='block';
+}
+if(p.get('error')==='wrong_credentials'){
+  const e=document.getElementById('error');
+  e.textContent='Invalid admin credentials. Please try again.';
+  e.style.display='block';
+}
+</script>
+</body>
+</html>
+)rawliteral";
+
+// ======================== "CONNECTED" SUCCESS PAGE ==========================
+const char WEB_CONNECTED_HTML[] PROGMEM = R"rawliteral(
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Connected — NodeX</title>
+<style>
+:root{--bg:#0f172a;--text:#e2e8f0;--green:#22c55e;--text2:#94a3b8;--accent2:#22d3ee}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);
+min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;text-align:center}
+.wrap{max-width:400px}
+.check{font-size:4rem;color:var(--green);margin-bottom:16px}
+h1{font-size:1.5rem;color:#fff;margin-bottom:8px}
+h1 span{color:var(--accent2)}
+p{color:var(--text2);font-size:.9rem;line-height:1.5;margin-bottom:8px}
+.ok{color:var(--green);font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="check">&#10003;</div>
+  <h1>Connected to Node<span>X</span></h1>
+  <p class="ok">You now have internet access.</p>
+  <p>You can close this page and start browsing normally.</p>
+</div>
+</body>
+</html>
+)rawliteral";
+
+// ====================== ADMIN DASHBOARD (full UI) ===========================
+
+const char WEB_UI_HTML[] PROGMEM = R"rawliteral(
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NodeX — Wi-Fi Repeater</title>
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--accent:#3b82f6;--accent2:#22d3ee;--text:#e2e8f0;
+--text2:#94a3b8;--red:#ef4444;--green:#22c55e;--yellow:#eab308;--border:#334155;
+--radius:12px;--shadow:0 4px 24px rgba(0,0,0,.35)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);
+min-height:100vh;padding:0}
+.header{background:linear-gradient(135deg,#1e3a5f,#0f172a);padding:20px 24px;
+border-bottom:1px solid var(--border);display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.header h1{font-size:1.5rem;font-weight:700;color:#fff;letter-spacing:-.5px}
+.header h1 span{color:var(--accent2)}
+.header .badge{font-size:.7rem;padding:3px 10px;border-radius:20px;font-weight:600}
+.badge.online{background:var(--green);color:#000}
+.badge.offline{background:var(--red);color:#fff}
+.container{max-width:960px;margin:0 auto;padding:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:20px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:20px;box-shadow:var(--shadow)}
+.card h2{font-size:.85rem;text-transform:uppercase;letter-spacing:1px;color:var(--text2);
+margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card h2::before{content:'';width:4px;height:16px;background:var(--accent);border-radius:2px}
+.stat{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid
+var(--border);font-size:.9rem}
+.stat:last-child{border:none}
+.stat .label{color:var(--text2)}
+.stat .value{font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
+.rssi-bar{display:inline-block;width:60px;height:8px;background:var(--border);
+border-radius:4px;overflow:hidden;vertical-align:middle;margin-left:8px}
+.rssi-bar .fill{height:100%;border-radius:4px;transition:width .4s}
+.tabs{display:flex;gap:4px;margin-bottom:20px;flex-wrap:wrap}
+.tab{padding:8px 18px;background:var(--card);border:1px solid var(--border);
+border-radius:8px;cursor:pointer;font-size:.85rem;color:var(--text2);transition:.2s}
+.tab:hover,.tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+th{text-align:left;padding:10px 12px;background:rgba(59,130,246,.1);color:var(--accent);
+border-bottom:2px solid var(--border);font-weight:600;text-transform:uppercase;
+letter-spacing:.5px;font-size:.75rem}
+td{padding:10px 12px;border-bottom:1px solid var(--border)}
+tr:hover td{background:rgba(255,255,255,.02)}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:.8rem;color:var(--text2);margin-bottom:4px;
+text-transform:uppercase;letter-spacing:.5px}
+.form-group input,.form-group select{width:100%;padding:10px 12px;background:var(--bg);
+border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.9rem}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--accent);
+box-shadow:0 0 0 3px rgba(59,130,246,.2)}
+.btn{padding:10px 20px;border:none;border-radius:8px;font-size:.85rem;font-weight:600;
+cursor:pointer;transition:.2s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#2563eb}
+.btn-danger{background:var(--red);color:#fff}
+.btn-danger:hover{background:#dc2626}
+.btn-sm{padding:6px 14px;font-size:.8rem}
+.btns{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:8px;
+color:#fff;font-size:.85rem;font-weight:600;z-index:999;opacity:0;transition:.3s;
+transform:translateY(20px)}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.ok{background:var(--green)}.toast.err{background:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.pulse{animation:pulse 2s infinite}
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Node<span>X</span></h1>
+  <span class="badge offline" id="statusBadge">OFFLINE</span>
+  <span style="margin-left:auto;font-size:.75rem;color:var(--text2)" id="uptimeLabel"></span>
+</div>
+
+<div class="container">
+  <div class="tabs">
+    <div class="tab active" data-tab="dashboard">Dashboard</div>
+    <div class="tab" data-tab="clients">Clients</div>
+    <div class="tab" data-tab="config">Configuration</div>
+    <div class="tab" data-tab="tools">Tools</div>
+  </div>
+
+  <!-- ========== DASHBOARD TAB ========== -->
+  <div id="tab-dashboard">
+    <div class="grid">
+      <div class="card">
+        <h2>Upstream (STA)</h2>
+        <div class="stat"><span class="label">SSID</span><span class="value" id="staSSID">—</span></div>
+        <div class="stat"><span class="label">IP Address</span><span class="value" id="staIP">—</span></div>
+        <div class="stat"><span class="label">MAC</span><span class="value" id="staMAC">—</span></div>
+        <div class="stat"><span class="label">Gateway</span><span class="value" id="staGW">—</span></div>
+        <div class="stat"><span class="label">Signal</span><span class="value" id="staRSSI">—
+          <span class="rssi-bar"><span class="fill" id="rssiFill"></span></span></span></div>
+      </div>
+      <div class="card">
+        <h2>Repeater (AP)</h2>
+        <div class="stat"><span class="label">SSID</span><span class="value" id="apSSID">—</span></div>
+        <div class="stat"><span class="label">IP Address</span><span class="value" id="apIP">—</span></div>
+        <div class="stat"><span class="label">MAC</span><span class="value" id="apMAC">—</span></div>
+        <div class="stat"><span class="label">Channel</span><span class="value" id="apChan">—</span></div>
+        <div class="stat"><span class="label">Clients</span><span class="value" id="apClients">—</span></div>
+      </div>
+      <div class="card">
+        <h2>System</h2>
+        <div class="stat"><span class="label">Chip</span><span class="value" id="chipModel">—</span></div>
+        <div class="stat"><span class="label">CPU</span><span class="value" id="cpuFreq">—</span></div>
+        <div class="stat"><span class="label">Flash</span><span class="value" id="flashSize">—</span></div>
+        <div class="stat"><span class="label">Free Heap</span><span class="value" id="freeHeap">—</span></div>
+        <div class="stat"><span class="label">Heap Total</span><span class="value" id="heapSize">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== CLIENTS TAB ========== -->
+  <div id="tab-clients" class="hidden">
+    <div class="card">
+      <h2>Connected Devices</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>MAC Address</th><th>IP Address</th></tr></thead>
+          <tbody id="clientsBody"><tr><td colspan="3" style="text-align:center;color:var(--text2)">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== CONFIG TAB ========== -->
+  <div id="tab-config" class="hidden">
+    <div class="grid">
+      <div class="card">
+        <h2>Station (Upstream)</h2>
+        <div class="form-group"><label>SSID</label><input id="cfgStaSSID" placeholder="Your Wi-Fi name"></div>
+        <div class="form-group"><label>Password</label><input id="cfgStaPass" type="password" placeholder="Wi-Fi password"></div>
+        <button class="btn btn-sm btn-primary" onclick="scanNetworks()">Scan Networks</button>
+        <div id="scanResults" class="hidden" style="margin-top:10px">
+          <table><thead><tr><th>SSID</th><th>RSSI</th><th>Ch</th><th></th></tr></thead>
+          <tbody id="scanBody"></tbody></table>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Access Point</h2>
+        <div class="form-group"><label>SSID</label><input id="cfgApSSID" placeholder="NodeX_Repeater"></div>
+        <div class="form-group"><label>Password (min 8 chars)</label><input id="cfgApPass" type="password" placeholder="Leave blank to keep current"></div>
+        <div class="form-group"><label>Channel (1-13)</label><input id="cfgApChan" type="number" min="1" max="13"></div>
+        <div class="form-group"><label>Max Clients (1-10)</label><input id="cfgApMax" type="number" min="1" max="10"></div>
+      </div>
+      <div class="card">
+        <h2>Security</h2>
+        <div class="form-group"><label>Dashboard Username</label><input id="cfgWebUser"></div>
+        <div class="form-group"><label>Dashboard Password</label><input id="cfgWebPass" type="password"></div>
+        <div class="form-group"><label>OTA Password</label><input id="cfgOtaPass" type="password"></div>
+      </div>
+    </div>
+    <div class="btns">
+      <button class="btn btn-primary" onclick="saveConfig()">Save Configuration</button>
+    </div>
+  </div>
+
+  <!-- ========== TOOLS TAB ========== -->
+  <div id="tab-tools" class="hidden">
+    <div class="grid">
+      <div class="card">
+        <h2>Device Actions</h2>
+        <p style="font-size:.85rem;color:var(--text2);margin-bottom:14px">
+          These actions take effect immediately.
+        </p>
+        <div class="btns">
+          <button class="btn btn-primary" onclick="rebootDevice()">Reboot</button>
+          <button class="btn btn-danger" onclick="factoryReset()">Factory Reset</button>
+        </div>
+      </div>
+      <div class="card">
+        <h2>OTA Update</h2>
+        <p style="font-size:.85rem;color:var(--text2)">
+          Use PlatformIO or Arduino IDE OTA upload.<br>
+          Hostname: <strong>NodeX</strong> &nbsp; Port: <strong>3232</strong>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// --- Tab switching ---
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    ['dashboard','clients','config','tools'].forEach(id=>{
+      document.getElementById('tab-'+id).classList.toggle('hidden',id!==t.dataset.tab);
+    });
+    if(t.dataset.tab==='clients') fetchClients();
+    if(t.dataset.tab==='config') fetchConfig();
+  });
+});
+
+// --- Toast ---
+function toast(msg,ok){
+  const el=document.getElementById('toast');
+  el.textContent=msg;
+  el.className='toast show '+(ok?'ok':'err');
+  setTimeout(()=>el.className='toast',3000);
+}
+
+// --- Helpers ---
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function authHeaders(){
+  // Credentials sent via HTTP Basic Auth handled by browser prompt
+  return {};
+}
+async function api(url,opts={}){
+  const r=await fetch(url,opts);
+  if(r.status===401){toast('Authentication required',false);throw new Error('401');}
+  return r;
+}
+
+// --- Format uptime ---
+function fmtUptime(s){
+  const d=Math.floor(s/86400),h=Math.floor(s%86400/3600),m=Math.floor(s%3600/60);
+  let str='';
+  if(d)str+=d+'d ';
+  str+=h+'h '+m+'m';
+  return str;
+}
+
+// --- RSSI to percentage ---
+function rssiPct(rssi){return Math.min(100,Math.max(0,(rssi+100)*2));}
+function rssiColor(pct){return pct>60?'var(--green)':pct>30?'var(--yellow)':'var(--red)';}
+
+// --- Fetch status ---
+async function fetchStatus(){
+  try{
+    const r=await api('/api/status');
+    const d=await r.json();
+    document.getElementById('staSSID').textContent=d.staSSID||'—';
+    document.getElementById('staIP').textContent=d.staConnected?d.staIP:'Disconnected';
+    document.getElementById('staMAC').textContent=d.staMAC;
+    document.getElementById('staGW').textContent=d.staGateway;
+    const pct=rssiPct(d.staRSSI);
+    document.getElementById('staRSSI').innerHTML=d.staRSSI+' dBm <span class="rssi-bar"><span class="fill" style="width:'+pct+'%;background:'+rssiColor(pct)+'"></span></span>';
+    document.getElementById('apSSID').textContent=d.apSSID;
+    document.getElementById('apIP').textContent=d.apIP;
+    document.getElementById('apMAC').textContent=d.apMAC;
+    document.getElementById('apChan').textContent=d.apChannel;
+    document.getElementById('apClients').textContent=d.apClients+' / '+d.apMaxClients;
+    document.getElementById('chipModel').textContent=d.chipModel;
+    document.getElementById('cpuFreq').textContent=d.cpuFreqMHz+' MHz';
+    document.getElementById('flashSize').textContent=d.flashSizeMB+' MB';
+    document.getElementById('freeHeap').textContent=(d.freeHeap/1024).toFixed(1)+' KB';
+    document.getElementById('heapSize').textContent=(d.heapSize/1024).toFixed(1)+' KB';
+    document.getElementById('uptimeLabel').textContent='Uptime: '+fmtUptime(d.uptime);
+    const badge=document.getElementById('statusBadge');
+    if(d.staConnected){badge.textContent='ONLINE';badge.className='badge online';}
+    else{badge.textContent='OFFLINE';badge.className='badge offline';}
+  }catch(e){console.warn('Status fetch failed',e);}
+}
+
+// --- Fetch clients ---
+async function fetchClients(){
+  try{
+    const r=await api('/api/clients');
+    const arr=await r.json();
+    const tb=document.getElementById('clientsBody');
+    if(!arr.length){tb.innerHTML='<tr><td colspan="3" style="text-align:center;color:var(--text2)">No clients connected</td></tr>';return;}
+    tb.innerHTML=arr.map((c,i)=>'<tr><td>'+(i+1)+'</td><td>'+esc(c.mac)+'</td><td>'+esc(c.ip)+'</td></tr>').join('');
+  }catch(e){console.warn('Clients fetch failed',e);}
+}
+
+// --- Fetch config ---
+async function fetchConfig(){
+  try{
+    const r=await api('/api/config');
+    const d=await r.json();
+    document.getElementById('cfgStaSSID').value=d.staSSID||'';
+    document.getElementById('cfgApSSID').value=d.apSSID||'';
+    document.getElementById('cfgApChan').value=d.apChannel||1;
+    document.getElementById('cfgApMax').value=d.apMaxClients||8;
+  }catch(e){}
+}
+
+// --- Save config ---
+async function saveConfig(){
+  const body={};
+  const v=s=>document.getElementById(s).value;
+  if(v('cfgStaSSID'))  body.staSSID=v('cfgStaSSID');
+  if(v('cfgStaPass'))  body.staPass=v('cfgStaPass');
+  if(v('cfgApSSID'))   body.apSSID=v('cfgApSSID');
+  if(v('cfgApPass'))   body.apPass=v('cfgApPass');
+  if(v('cfgApChan'))   body.apChannel=parseInt(v('cfgApChan'));
+  if(v('cfgApMax'))    body.apMaxClients=parseInt(v('cfgApMax'));
+  if(v('cfgWebUser'))  body.webUser=v('cfgWebUser');
+  if(v('cfgWebPass'))  body.webPass=v('cfgWebPass');
+  if(v('cfgOtaPass'))  body.otaPass=v('cfgOtaPass');
+  try{
+    const r=await api('/api/config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d=await r.json();
+    if(r.ok) toast('Configuration saved — reboot to apply',true);
+    else toast(d.error||'Save failed',false);
+  }catch(e){toast('Save failed',false);}
+}
+
+// --- Scan ---
+async function scanNetworks(){
+  document.getElementById('scanResults').classList.remove('hidden');
+  document.getElementById('scanBody').innerHTML='<tr><td colspan="4">Scanning…</td></tr>';
+  try{
+    await api('/api/scan');
+    setTimeout(async()=>{
+      const r=await api('/api/scan');
+      const arr=await r.json();
+      if(arr.status==='scanning'){document.getElementById('scanBody').innerHTML='<tr><td colspan="4">Still scanning… try again</td></tr>';return;}
+      if(!arr.length){document.getElementById('scanBody').innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--text2)">No networks found</td></tr>';return;}
+      document.getElementById('scanBody').innerHTML=arr.map(n=>
+        '<tr><td>'+esc(n.ssid)+'</td><td>'+n.rssi+'</td><td>'+n.channel+'</td><td><button class="btn btn-sm btn-primary" data-ssid="'+esc(n.ssid)+'" onclick="document.getElementById(\'cfgStaSSID\').value=this.dataset.ssid">Select</button></td></tr>'
+      ).join('');
+    },4000);
+  }catch(e){toast('Scan failed',false);}
+}
+
+// --- Reboot ---
+async function rebootDevice(){
+  if(!confirm('Reboot NodeX?'))return;
+  try{await api('/api/reboot',{method:'POST'});toast('Rebooting…',true);}catch(e){toast('Reboot failed',false);}
+}
+
+// --- Factory Reset ---
+async function factoryReset(){
+  if(!confirm('FACTORY RESET — all settings will be erased. Continue?'))return;
+  try{await api('/api/factory-reset',{method:'POST'});toast('Factory reset — rebooting…',true);}catch(e){toast('Reset failed',false);}
+}
+
+// --- Auto-refresh ---
+fetchStatus();
+setInterval(fetchStatus,5000);
+</script>
+</body>
+</html>
+)rawliteral";
