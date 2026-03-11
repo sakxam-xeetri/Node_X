@@ -397,30 +397,9 @@ async function doLogin(code){
       await sleep(300);appendLine('<span class="boot-ok">[\u2713] DNS forwarding active</span>');
       await sleep(300);appendLine('<span class="boot-ok">[\u2713] Internet access enabled</span>');
       await sleep(300);
-      appendLine(
-        '<span class="dim">\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501</span><br>'+
-        '<span class="white">  \u2713 Connected \u2014 internet access is now active.</span><br>'+
-        '<span class="dim">  You may close this page and browse normally from any app.</span><br>'+
-        '<span class="dim">\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501</span>'
-      );
-      await sleep(400);
-      appendLine(
-        '<div style="margin:10px 0;padding:14px;border:1px dashed #b48ead;display:inline-block;text-align:center">'+
-        '<div style="color:#b48ead;font-weight:700;margin-bottom:10px;font-size:.9rem">\u2728 Follow me on Instagram</div>'+
-        '<img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://www.instagram.com/sakxam_console.log/" '+
-        'alt="Scan QR" style="width:160px;height:160px;image-rendering:pixelated;display:block;margin:0 auto 10px;border-radius:4px;background:#fff;padding:6px">'+
-        '<a href="https://www.instagram.com/sakxam_console.log/" target="_blank" rel="noopener noreferrer" '+
-        'style="color:#e06060;text-decoration:none;font-weight:600;font-size:.85rem">@sakxam_console.log</a></div>'
-      );
-      await sleep(400);
-      appendLine('<span class="dim">Redirecting in a few seconds\u2026 or <a href="#" onclick="window.location.replace(\'http://\'+location.hostname+\'/hotspot-detect.html\');return false;" style="color:#4ec843">continue now</a></span>');
-      // Navigate the CNA browser to the OS captive-portal success URL.
-      // iOS needs <body>Success</body>; Android needs HTTP 204.
-      // /hotspot-detect.html returns the iOS success HTML for authenticated
-      // clients, and most Android CNAs also accept any non-redirect 2xx.
-      // This closes the mini-browser gracefully so Wi-Fi stays connected.
-      await sleep(10000);
-      window.location.replace('http://'+location.hostname+'/hotspot-detect.html');
+      appendLine('<span class="dim">Loading\u2026</span>');
+      await sleep(800);
+      window.location.href='/connected';
     } else {throw new Error('denied');}
   }catch(e){
     b.innerHTML='<span class="boot-fail">[\u2717] Access denied \u2014 invalid login code</span>';
@@ -607,7 +586,7 @@ font-weight:700;letter-spacing:.5px;transition:.2s;border-radius:2px}
   <div class="heading">You&rsquo;re Online &#10003;</div>
   <div class="subheading">Browsing is now active &mdash; you can close this page</div>
   <div class="divider"></div>
-  <div class="follow-label">&#10024; &nbsp; Follow the Dev &nbsp; &#10024;</div>
+  <div class="follow-label">Follow the Dev</div>
   <div class="qr-frame">
     <img src="https://api.qrserver.com/v1/create-qr-code/?size=440x440&data=https://www.instagram.com/sakxam_console.log/"
          alt="Scan to follow on Instagram">
