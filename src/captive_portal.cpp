@@ -6,6 +6,10 @@
 
 CaptivePortal Portal;
 
+void CaptivePortal::setSessionTimeoutMs(unsigned long ms) {
+    _sessionTimeoutMs = ms;
+}
+
 // ---- Lifecycle ----
 
 void CaptivePortal::begin(IPAddress apIP, IPAddress upstreamDNS) {
@@ -32,7 +36,7 @@ bool CaptivePortal::isAuthenticated(IPAddress clientIP) {
     unsigned long now = millis();
     bool found = false;
     for (auto it = _clients.begin(); it != _clients.end(); ) {
-        if ((now - it->authTime) >= SESSION_TIMEOUT_MS) {
+        if ((now - it->authTime) >= _sessionTimeoutMs) {
             it = _clients.erase(it);          // prune expired
         } else {
             if (it->ip == ip) found = true;
@@ -83,7 +87,7 @@ std::vector<CaptivePortal::SessionInfo> CaptivePortal::getSessions() {
     unsigned long now = millis();
     for (auto& c : _clients) {
         unsigned long age = now - c.authTime;
-        if (age < SESSION_TIMEOUT_MS)
+        if (age < _sessionTimeoutMs)
             result.push_back({IPAddress(c.ip), age});
     }
     xSemaphoreGive(_mutex);
