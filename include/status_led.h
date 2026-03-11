@@ -21,6 +21,7 @@ public:
 
     enum Pattern { OFF, SOLID_ON, BLINK_SLOW, BLINK_FAST, BREATHE, BLINK_NOTIFY };
     void setPattern(Pattern p);
+    Pattern getPattern() const { return _pattern; }
     void notify();  // quick triple-blink, then resume previous pattern
 
 private:
