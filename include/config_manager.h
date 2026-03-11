@@ -30,6 +30,8 @@ struct NodeXConfig {
     String webPass;
     // OTA
     String otaPass;
+    // Session
+    uint16_t sessionTimeoutMin;
     // Saved networks (up to MAX_SAVED_NETWORKS entries)
     std::vector<SavedNetwork> savedNetworks;
 };
