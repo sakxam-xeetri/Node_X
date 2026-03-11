@@ -60,5 +60,27 @@ void StatusLED::update() {
                 _lastToggle = now;
             }
             break;
+
+        case BLINK_NOTIFY:
+            if (now - _lastToggle >= 100) {
+                _ledState = !_ledState;
+                ledcWrite(PIN_LED_STATUS, _ledState ? 255 : 0);
+                _lastToggle = now;
+                if (!_ledState) _notifyCount++;
+                if (_notifyCount >= 3) {
+                    _pattern = _prevPattern;
+                    _notifyCount = 0;
+                }
+            }
+            break;
     }
+}
+
+void StatusLED::notify() {
+    if (_pattern == BLINK_NOTIFY) return;
+    _prevPattern = _pattern;
+    _notifyCount = 0;
+    _ledState = false;
+    _lastToggle = millis();
+    _pattern = BLINK_NOTIFY;
 }
