@@ -403,12 +403,23 @@ async function doLogin(code){
         '<span class="dim">  You may close this page and browse normally from any app.</span><br>'+
         '<span class="dim">\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501</span>'
       );
+      await sleep(400);
+      appendLine(
+        '<div style="margin:10px 0;padding:14px;border:1px dashed #b48ead;display:inline-block;text-align:center">'+
+        '<div style="color:#b48ead;font-weight:700;margin-bottom:10px;font-size:.9rem">\u2728 Follow me on Instagram</div>'+
+        '<img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://www.instagram.com/sakxam_console.log/" '+
+        'alt="Scan QR" style="width:160px;height:160px;image-rendering:pixelated;display:block;margin:0 auto 10px;border-radius:4px;background:#fff;padding:6px">'+
+        '<a href="https://www.instagram.com/sakxam_console.log/" target="_blank" rel="noopener noreferrer" '+
+        'style="color:#e06060;text-decoration:none;font-weight:600;font-size:.85rem">@sakxam_console.log</a></div>'
+      );
+      await sleep(400);
+      appendLine('<span class="dim">Redirecting in a few seconds\u2026 or <a href="#" onclick="window.location.replace(\'http://\'+location.hostname+\'/hotspot-detect.html\');return false;" style="color:#4ec843">continue now</a></span>');
       // Navigate the CNA browser to the OS captive-portal success URL.
       // iOS needs <body>Success</body>; Android needs HTTP 204.
       // /hotspot-detect.html returns the iOS success HTML for authenticated
       // clients, and most Android CNAs also accept any non-redirect 2xx.
       // This closes the mini-browser gracefully so Wi-Fi stays connected.
-      await sleep(1800);
+      await sleep(10000);
       window.location.replace('http://'+location.hostname+'/hotspot-detect.html');
     } else {throw new Error('denied');}
   }catch(e){
@@ -577,6 +588,13 @@ animation:blink 1s step-end infinite;vertical-align:text-bottom;margin-left:2px}
 <div class="line"><span class="white">You are now connected to the internet.</span></div>
 <div class="line"><span class="dim">You can close this page and browse normally.</span></div>
 <div class="line">&nbsp;</div>
+<div style="padding:14px;border:1px dashed #b48ead;display:inline-block;text-align:center;margin-bottom:12px">
+  <div style="color:#b48ead;font-weight:700;margin-bottom:10px;font-size:.9rem">&#10024; Follow me on Instagram</div>
+  <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&amp;data=https://www.instagram.com/sakxam_console.log/"
+       alt="Scan QR Code" style="width:160px;height:160px;image-rendering:pixelated;display:block;margin:0 auto 10px;border-radius:4px;background:#fff;padding:6px">
+  <a href="https://www.instagram.com/sakxam_console.log/" target="_blank" rel="noopener noreferrer"
+     style="color:#e06060;text-decoration:none;font-weight:600;font-size:.85rem">@sakxam_console.log</a>
+</div>
 <div class="line"><span class="prompt">sakshyam@arch:~$</span> <span class="cursor-blink">&nbsp;</span></div>
 </body>
 </html>
@@ -659,6 +677,9 @@ cursor:pointer;transition:.2s;font-family:inherit;background:none;color:#e0e0e0}
 font-size:.82rem;font-weight:600;z-index:999;opacity:0;transition:.3s;transform:translateY(20px);border:1px dashed #444}
 .toast.show{opacity:1;transform:translateY(0)}.toast.ok{background:#4ec843}.toast.err{background:#e06060}
 .hidden{display:none}
+.pw-wrap{position:relative}.pw-wrap input{padding-right:52px}
+.pw-toggle{position:absolute;right:4px;top:50%;transform:translateY(-50%);background:none;border:none;color:#555;cursor:pointer;font-size:.72rem;padding:4px 8px;font-family:inherit}
+.pw-toggle:hover{color:#e06060}
 @media(max-width:600px){.main{padding:12px}.top-bar,.status-bar{padding:4px 12px}
 .form-grid{grid-template-columns:1fr}.stat .lbl{min-width:100px}}
 </style>
@@ -715,6 +736,12 @@ font-size:.82rem;font-weight:600;z-index:999;opacity:0;transition:.3s;transform:
     <table><thead><tr><th>#</th><th>SSID</th><th>Actions</th></tr></thead>
     <tbody id="networksBody"><tr><td colspan="3" class="dim" style="text-align:center">Loading...</td></tr></tbody></table>
     <div class="section-title yellow" style="margin-top:18px">###### Add / Update Network</div>
+    <div class="dim" style="font-size:.78rem;margin-bottom:6px">Scan for available networks to easily select and save them.</div>
+    <div class="btns" style="margin-bottom:10px"><button class="btn btn-sm btn-blue" onclick="scanAndList()">Scan WiFi Networks</button></div>
+    <div id="scanListResults" class="hidden" style="margin-bottom:12px">
+      <table><thead><tr><th>SSID</th><th>RSSI</th><th>Ch</th><th>Secure</th><th></th></tr></thead>
+      <tbody id="scanListBody"></tbody></table>
+    </div>
     <div class="form-grid" style="margin-top:10px">
       <div class="card">
         <h3>Save Credentials</h3>
@@ -732,7 +759,7 @@ font-size:.82rem;font-weight:600;z-index:999;opacity:0;transition:.3s;transform:
       <div class="card">
         <h3>Station (Upstream)</h3>
         <div class="form-group"><label>SSID</label><input id="cfgStaSSID" placeholder="Wi-Fi network name"></div>
-        <div class="form-group"><label>Password</label><input id="cfgStaPass" type="password" placeholder="Wi-Fi password"></div>
+        <div class="form-group"><label>Password</label><div class="pw-wrap"><input id="cfgStaPass" type="password" placeholder="Wi-Fi password"><button type="button" class="pw-toggle" onclick="togglePw('cfgStaPass')">show</button></div></div>
         <button class="btn btn-sm btn-blue" onclick="scanNetworks()">Scan Networks</button>
         <div id="scanResults" class="hidden" style="margin-top:8px">
           <table><thead><tr><th>SSID</th><th>RSSI</th><th>Ch</th><th></th></tr></thead>
@@ -753,8 +780,13 @@ font-size:.82rem;font-weight:600;z-index:999;opacity:0;transition:.3s;transform:
       <div class="card">
         <h3>Dashboard Auth (API)</h3>
         <div class="form-group"><label>Username</label><input id="cfgWebUser"></div>
-        <div class="form-group"><label>Password</label><input id="cfgWebPass" type="password"></div>
-        <div class="form-group"><label>OTA Password</label><input id="cfgOtaPass" type="password"></div>
+        <div class="form-group"><label>Password</label><div class="pw-wrap"><input id="cfgWebPass" type="password"><button type="button" class="pw-toggle" onclick="togglePw('cfgWebPass')">show</button></div></div>
+        <div class="form-group"><label>OTA Password</label><div class="pw-wrap"><input id="cfgOtaPass" type="password"><button type="button" class="pw-toggle" onclick="togglePw('cfgOtaPass')">show</button></div></div>
+      </div>
+      <div class="card">
+        <h3>Session Control</h3>
+        <div class="form-group"><label>Client Timeout (minutes)</label><input id="cfgSessTimeout" type="number" min="1" max="1440" placeholder="60"></div>
+        <div class="dim" style="font-size:.72rem">How long clients can use WiFi before re-login (1—1440 min). Applies immediately.</div>
       </div>
     </div>
     <div class="btns"><button class="btn btn-green" onclick="saveConfig()">Save Configuration</button></div>
@@ -915,6 +947,7 @@ async function fetchConfig(){
     document.getElementById('cfgApMax').value=d.apMaxClients||8;
     document.getElementById('cfgApPass').placeholder=d.apPass||'';
     document.getElementById('cfgAdminCode').placeholder=d.adminCode||'';
+    document.getElementById('cfgSessTimeout').value=d.sessionTimeout||60;
   }catch(e){}
 }
 
@@ -931,6 +964,7 @@ async function saveConfig(){
   if(v('cfgWebUser'))body.webUser=v('cfgWebUser');
   if(v('cfgWebPass'))body.webPass=v('cfgWebPass');
   if(v('cfgOtaPass'))body.otaPass=v('cfgOtaPass');
+  if(v('cfgSessTimeout'))body.sessionTimeout=parseInt(v('cfgSessTimeout'));
   try{
     const r=await fetch('/api/config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     const d=await r.json();
@@ -966,6 +1000,23 @@ async function factoryReset(){
 function logout(){
   fetch('/portal/logout',{method:'POST'}).then(()=>{window.location.href='/';}).catch(()=>{window.location.href='/';});
 }
+function togglePw(id){const i=document.getElementById(id);i.type=i.type==='password'?'text':'password';i.nextElementSibling.textContent=i.type==='password'?'show':'hide';}
+async function scanAndList(){
+  document.getElementById('scanListResults').classList.remove('hidden');
+  document.getElementById('scanListBody').innerHTML='<tr><td colspan="5" class="dim">Scanning\u2026</td></tr>';
+  try{
+    await fetch('/api/scan');
+    setTimeout(async()=>{
+      const r=await fetch('/api/scan');const arr=await r.json();
+      if(arr.status==='scanning'){document.getElementById('scanListBody').innerHTML='<tr><td colspan="5" class="dim">Still scanning\u2026 try again</td></tr>';return;}
+      if(!arr.length){document.getElementById('scanListBody').innerHTML='<tr><td colspan="5" class="dim">No networks found</td></tr>';return;}
+      document.getElementById('scanListBody').innerHTML=arr.map(n=>
+        '<tr><td>'+esc(n.ssid)+'</td><td>'+n.rssi+'</td><td>'+n.channel+'</td><td>'+(n.secure?'\ud83d\udd12':'Open')+'</td><td><button class="btn btn-sm btn-green" data-ssid="'+esc(n.ssid)+'" onclick="selectScanned(this.dataset.ssid)">Select</button></td></tr>'
+      ).join('');
+    },4000);
+  }catch(e){toast('Scan failed',false);}
+}
+function selectScanned(ssid){document.getElementById('newNetSSID').value=ssid;document.getElementById('newNetPass').value='';document.getElementById('newNetPass').focus();}
 
 fetchStatus();
 setInterval(fetchStatus,5000);
