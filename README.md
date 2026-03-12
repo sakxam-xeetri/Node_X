@@ -33,15 +33,19 @@ It is designed for **real-world deployment**, **tech exhibitions**, **robotics d
 
 > Built by **[sakshyam](https://www.instagram.com/sakxam_console.log/)** — Embedded Systems Engineer, Kathmandu, Nepal.
 
-### Why NodeX?
+### The Real Story
 
-| Use Case | What it does |
-|---|---|
-| **Tech Exhibitions** | Broadcast your identity + portfolio as a captive portal — visitors connect and see *you* |
-| **Robotics Demos** | Standalone Wi-Fi AP that bridges your bot to any upstream network on the fly |
-| **Portable Network Lab** | Full STA+AP+NAT repeater, DNS interceptor, and client manager in your pocket |
-| **Field Deployments** | OTA updates, NVS persistence, and watchdog recovery — runs unattended for days |
-| **CTF / Security Research** | Captive portal with per-client auth, session management, and DNS interception |
+It started with a scrap ESP32 sitting on my desk doing nothing.
+
+The actual problem hit at hackathons and events — the venue Wi-Fi is either locked down, too slow for a team, or simply doesn't reach everywhere. We needed a way to **share one upstream connection across the whole team** without fussing with hotspots and phone batteries.
+
+But then came the second realization: at those same events, **who you are and who sees you matters**. You're meeting engineers, judges, founders — and networking is everything. So what if, instead of just being a repeater, every person who connected to my Wi-Fi also saw **my portfolio**? Running entirely on a 4 MB ESP32. No cloud, no server, no laptop left open — just a chip on a keychain.
+
+That became the core idea:
+
+> *Solve the team's Wi-Fi problem. Make every connection a personal introduction.*
+
+The captive portal turned into an interactive terminal-themed portfolio page. The repeater became a full networking utility. And the whole thing fit on a device small enough to hang off your bag.
 
 ---
 
