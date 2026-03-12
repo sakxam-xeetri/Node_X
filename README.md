@@ -32,7 +32,7 @@
 
 > Built by **[sakshyam](https://www.instagram.com/sakxam_console.log/)** — Embedded Systems Engineer, Kathmandu, Nepal.
 
-### The Real Story
+### Story Time ::::
 
 It started with a scrap ESP32 sitting on my desk — originally pulled off a dev board I had no other use for.
 
