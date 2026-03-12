@@ -35,17 +35,35 @@ It is designed for **real-world deployment**, **tech exhibitions**, **robotics d
 
 ### The Real Story
 
-It started with a scrap ESP32 sitting on my desk doing nothing.
+It started with a scrap ESP32 sitting on my desk — originally pulled off a dev board I had no other use for.
 
-The actual problem hit at hackathons and events — the venue Wi-Fi is either locked down, too slow for a team, or simply doesn't reach everywhere. We needed a way to **share one upstream connection across the whole team** without fussing with hotspots and phone batteries.
+The problem became clear the first time I went to a hackathon. Venue Wi-Fi is either rate-limited to almost nothing, completely locked behind a registration wall, or just doesn't reach the corner of the room where your team is heads-down building. Everyone ends up burning their phone's hotspot, draining batteries mid-demo, and still getting two bars of LTE pretending to be Wi-Fi. It was frustrating every single time.
 
-But then came the second realization: at those same events, **who you are and who sees you matters**. You're meeting engineers, judges, founders — and networking is everything. So what if, instead of just being a repeater, every person who connected to my Wi-Fi also saw **my portfolio**? Running entirely on a 4 MB ESP32. No cloud, no server, no laptop left open — just a chip on a keychain.
+So I flashed that scrap ESP32 as a repeater. Grab the venue network on one radio, rebroadcast it on another — the whole team stays connected through one device that costs almost nothing and runs off a USB port. That part worked immediately. Problem solved.
 
-That became the core idea:
+But then came the second thing.
 
-> *Solve the team's Wi-Fi problem. Make every connection a personal introduction.*
+At hackathons, tech meetups, robotics events — **the people you meet matter as much as what you build**. Judges walk around. Engineers stop by your table. Someone asks what you're working on. You hand them your card and it disappears into a pocket forever. LinkedIn connections get forgotten. The window is small.
 
-The captive portal turned into an interactive terminal-themed portfolio page. The repeater became a full networking utility. And the whole thing fit on a device small enough to hang off your bag.
+I thought: what if connecting to my Wi-Fi was itself the introduction? Every person who joins the network gets the captive portal — which is not a login page, it's a **fully interactive terminal-themed portfolio**. An Arch Linux boot sequence, `neofetch`-style header, my skills, my work, a QR code to my Instagram, all served live off a 4 MB chip hanging on my keychain. No cloud. No server running somewhere. No laptop left open on the table. Just the ESP32.
+
+The reaction at events when someone connects and that terminal loads up — it does the talking.
+
+### How I Actually Use It
+
+```
+Power on → connects to venue Wi-Fi automatically (saved credentials)
+         → broadcasts "NodeX" open AP
+         → LED starts breathing — ready in ~3 seconds
+```
+
+1. **Find the venue network** — scan from the dashboard, tap Select, save, reboot. Done once per location.
+2. **The whole team connects to `NodeX`** — full internet shared, everyone on the same local network for device communication too.
+3. **Anyone curious connects** — captive portal fires on their phone automatically. They see the terminal, type `help`, poke around, hit my socials.
+4. **I manage sessions from the dashboard** — see who's on, kick idle clients, adjust timeout, check signal strength in real time.
+5. **Updates over the air** — if I push a new version of the portal page or firmware, I flash it wirelessly. The device never has to leave my bag.
+
+> The whole point: one chip, always in my pocket, solves a real problem for the team *and* makes every connection count.
 
 ---
 
