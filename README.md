@@ -29,7 +29,6 @@
 
 **NodeX** is a keychain-sized portable Wi-Fi utility device built on ESP32 that combines advanced networking tools, a configurable captive portal, and a personal digital identity beacon.
 
-It is designed for **real-world deployment**, **tech exhibitions**, **robotics demonstrations**, and **portable networking labs** — fitting in your pocket yet packing the power of a full wireless infrastructure node.
 
 > Built by **[sakshyam](https://www.instagram.com/sakxam_console.log/)** — Embedded Systems Engineer, Kathmandu, Nepal.
 
